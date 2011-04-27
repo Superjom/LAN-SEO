@@ -1,0 +1,36 @@
+文档说明：
+    spider.py  
+    爬虫注入口
+    spider/
+    爬虫库入口
+
+    indexer.py
+	索引库程序主入口
+	run :读取文件，产生hits列表 
+	savehits: 将内存中的hits进行排序 考虑将hits随着100个文件进行分别存储
+	findWordId: 返回word在词库中的wordID
+	sortWordID: 在解析完毕之后，将文件进行读取 在内存中进行合并 
+		    采用快速排序方法，进行原地排序 将其对于wordID进行排序
+
+    indexer/ 
+	索引库文件
+	SortFind.py
+	    二分法查找公共方法
+	wordbar2.py (SortFind.py)
+	    词库查找及操作,重载自 SortFind.py
+    UrlParser.py
+	url解析库主入口
+	对url投票及url库的相关处理
+	urlvote()   :开始投票操作 并且自动将投票中的投票族进行保存
+		    需奥内存中的投票族达到一定数量时，才能够保存
+	sorvote()   :将刚刚生成的多个投票文件进行合并
+		    合并过程中，分别对 从和主投票族进行快速排序
+		    采用了公共的排序方法	
+	
+	urlParser/
+	    url解析库
+	    urlbar.py ( SortFind.py )
+		url库的初始化及查询
+	    
+		
+	
