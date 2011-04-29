@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#from sgmllib import SGMLParser  
 import threading  
 import time  
 import urllib2  
@@ -157,7 +156,7 @@ class reptile(threading.Thread):
             #临时的url表 储存未经过处理的url 向下交给 trans_d 转化为局部home_url的url
             tem_url=[]
             try:                                      #这样可以减轻网络压力  
-                page = opener.open(request,timeout=5)#发送请求报文  
+                page = opener.open(request,timeout=2)#发送请求报文  
                 if page.code == 200:       #当请求成功  
                     predata = page.read() #下载gzip格式的网页  
                     pdata = StringIO.StringIO(predata)#下面6行是实现解压缩  
@@ -183,7 +182,7 @@ class reptile(threading.Thread):
                     
                      
                     self.num += 1 
-                    self.way='store/html/'+self.getName()+str(self.num) 
+                    self.way='../store/html/'+self.getName()+str(self.num) 
                     #为了保证html后来的扩充性 重新决定保存为html源码
                     '''c=collector(data) 
                     #---------保存文件
@@ -199,7 +198,7 @@ class reptile(threading.Thread):
                     
                     #加入 总体 url表
                     self.Flcok.acquire()  
-                    confile = open('store/config.txt', 'a')  
+                    confile = open('../store/config.txt', 'a')  
                     confile.write( self.getName()+str(self.num) + ' ' + url + '\n')  
                     confile.close()  
                     self.Flcok.release()  
@@ -219,8 +218,6 @@ class reptile(threading.Thread):
                 break
                 return True
                 
-
-
 
     def trans_d(self,tem_url,rawurls):
         '将收获的url转化为 相对于局部主地址的绝对地址 并将其加入到inqueue中'

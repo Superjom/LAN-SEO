@@ -73,7 +73,7 @@ class Urlparser:
         f.close()
 
 if __name__=='__main__':
-    url=Urlparser('store/document','store/sortedurls.txt','store/votetolist','store/voteflist')
+    url=Urlparser('../store/document','../store/sortedurls.txt','../store/votetolist','../store/voteflist')
     url.run()
 
 

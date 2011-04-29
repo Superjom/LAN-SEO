@@ -3,6 +3,7 @@ from pyquery import PyQuery as pq
 import xml.dom.minidom as dom
 from sgmllib import SGMLParser  
 from html import htmlctrl
+from docUrlTrans import UrlTrans #url转化为绝对地址
 import re
 import sys
 
@@ -12,6 +13,7 @@ class collector():
     #用于从原料库中提取并加工出document 加入知识库
     #知识库中将包含用xml进行封装的各种信息
     def __init__(self,html):
+        self.transurl=UrlTrans('../store/sortedurls.txt')
         self.html=html
         self.d=pq(html)
         self.d('script').remove()
@@ -60,7 +62,10 @@ class collector():
 
         
 
-    def xml(self):
+    def xml(self,docID):
+        '返回xml源码'
+        #通过docID 在sortedurls 中确定 tem_home_url
+        self.transurl.setTemHomeUrl(docID) #确定tem_home_url
         str='<html></html>'
         titleText=self.d('title').text()
         self.dd=dom.parseString(str)
@@ -107,9 +112,11 @@ class collector():
         aa=htmlCtrl.gA()
         a=self.dd.createElement('a')
         for i in aa:
+            #i=self.transurl.trans_d(i) #对url转化为标准绝对地址
             aindex=self.dd.createElement('item')
             aindex.setAttribute('name',i)
-            aindex.setAttribute('href',self.a_trav(aa[i]))
+            #aindex.setAttribute('href',self.a_trav(aa[i]))
+            aindex.setAttribute('href',self.transurl.trans_d(aa[i]))
             a.appendChild(aindex)
         html.appendChild(a)
         #加入content

@@ -15,7 +15,6 @@ class parser:
         sys.setdefaultencoding('utf-8')
         self.ict=Ictclas('ICTCLAS50/') 
         self.wordbar=wordlist()#wordBar
-
         self.spword='@chunwei@' #区分内容的关键字
         #设定相应路径
         self.htmlph=htmlph
@@ -45,9 +44,9 @@ class parser:
             f.close()
             f=open(self.xmlph+'/'+hp,'w')
             try:
-                f.write(collec.xml().toxml())#写入到新文件中
+                f.write(collec.xml(hp).toxml())#写入到新文件中
             except:
-                pass
+                print 'can not trans xml'
             f.close()
             num+=1
 

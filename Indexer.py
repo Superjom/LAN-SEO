@@ -79,9 +79,9 @@ class Indexer:
         return self.wb.find(word)
 
 if __name__=='__main__':
-    index=Indexer('store/wordsplit','store/wordBar','store/hits')
+    index=Indexer('../store/wordsplit','../store/wordbar','../store/hits')
     index.run()
     #根据wordID进行排序
     index.sortWid()
-    index.savehits('store/sortedwidhits')
+    index.savehits('../store/sortedwidhits')
     #index.savehits()

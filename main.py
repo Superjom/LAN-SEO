@@ -13,7 +13,7 @@ sys.setdefaultencoding('utf-8')
 class Main:
     def __init__(self):
 #-------------------------------常量定义----------------------------------------------------
-        self.docdir='store/'  #数据目录基址
+        self.docdir='../store/'  #数据目录基址
 #-------------------------------url及html转化阶段-------------------------------------------
         #开始处理url 将doc转化为 docID
         #   将 store 目录中的 config.txt记录 url进行排序 将结果记录到 sortedurls.txt

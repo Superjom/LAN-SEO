@@ -68,6 +68,36 @@ class voteSortFr(sorter):
     def gvalue(self,data):
         return data[0]
 
+class urlsorter(sorter):
+    '根据url的hash值进行排序'
+    def __init__(self,path,savepath):
+        #格式类似于  [ [doc ,url] ]
+        self.sp=savepath #保存的路将
+
+        dlist=[]
+        print 'the path is',path
+        f=open(path)
+        lines=f.readlines()
+        f.close()
+        print 'the lines is'
+        for l in lines:
+            print l
+            dlist.append(l.split())
+        sorter.__init__(self,dlist)
+
+    def gvalue(self,data):
+        print 'the data is',data
+        return hash(data[1])
+
+    def savelist(self):
+        '保存排序后的结果'
+        f=open(self.sp,'w')
+        strr=''
+        for i in self.dali:
+            strr+=i[0]+' '+i[1]+'\n'
+        f.write(strr)
+        f.close()
+
 if __name__=='__main__':
     dali=[ [12,12] , [34,2] , [0,0] , [1,32] ]
     sort=voteSortTo(dali)
