@@ -10,6 +10,7 @@ from indexer import sorter
 
 #为了便于测试和性能的保证
 #将文件每100个保存到一个文件中 分开储存
+#需要 在docID排序的基础上 再根据wordID进行排序
 
 class Indexer:
     '索引器'
@@ -84,4 +85,7 @@ if __name__=='__main__':
     #根据wordID进行排序
     index.sortWid()
     index.savehits('../store/sortedwidhits')
+    #根据docID进行排序
+    index.sortDoc()
+    index.savehits('../store/sorteddochits')
     #index.savehits()
