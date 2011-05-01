@@ -98,8 +98,6 @@ if __name__=='__main__':
     index.savehits('../store/sorteddochits')
 
     #根据wordID进行排序
-    '''
     index.sortWid()
     index.savehits('../store/sortedwidhits')
-    '''
     #index.savehits()

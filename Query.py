@@ -6,6 +6,9 @@ sys.setdefaultencoding('utf-8')
 from ICTCLAS50.Ictclas import Ictclas
 from indexer.wordbar import Wordbar as wordbar
 from query.initHashWid import InitHashWid
+from query.initRankTotal import InitRankTotal
+#浮点数计算
+from decimal import *
 
 class Hitlist(list):
     '查询中产生的查询结果列表'
@@ -83,6 +86,10 @@ class Query:
         #hithash相关
         self.hithasher=InitHashWid('../store/sortedwidhits','../store/hithash')
         self.hithasher.initHashWid()#初始化hithash
+        #init rank total 单个doc的score总和
+        self.ranktotal=InitRankTotal('../store/sorteddochits','../store/tranks')
+        self.ranktotal.initTotalRank()
+
         self.hits=[]
         self.inithits()#初始化hits
         self.hithash=self.hithasher.hithash
@@ -128,8 +135,26 @@ class Query:
                 #print self.hits[index][0]
                 self.hitdoclist.find(self.hits[index])
                 index+=1
+
+        print 'the former doclist---------------------------'
         for i in self.hitdoclist:
             print i
+
+        #将score转化为相对score
+        print '开始转为相对score'
+        for i,score in enumerate(self.hitdoclist):
+            #调整精度
+            getcontext().prec = 8
+            docid=score[0]
+            rankpos=self.ranktotal.find([docid,0])#返回记录的位置
+            ranktotal=self.ranktotal.tranks[rankpos][1]
+            print 'rank',score[1],type(score[1])
+            print 'the total rank',int(ranktotal)
+            self.hitdoclist[i][1]=float(Decimal(score[1])/Decimal(int(ranktotal)))
+        print 'start to print the hitdoclist'
+        for i in self.hitdoclist:
+            print i
+
         
     def wordsplit(self,sentence):
         '将查询语句分词'
@@ -140,7 +165,8 @@ if __name__=='__main__':
     '''word=raw_input('query>>')
     while word != 'q':
         query.query(word)'''
-    query.query('理学院')
+    query.query('开放的中国农业大学欢迎您')
+
     #query.query('hello')
     
 

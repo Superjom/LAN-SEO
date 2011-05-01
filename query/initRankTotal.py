@@ -3,8 +3,9 @@
 import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
+from SortFind import SortFind
 
-class initRankTotal:
+class InitRankTotal(SortFind):
     '计算每个doc中标签得分总和 以便计算相对rank'
     def __init__(self,dochitph,tRankph):
         self.tRankph=tRankph #将要保存或初始化的rankTotal列表文件
@@ -16,6 +17,13 @@ class initRankTotal:
         f.close()
         for l in lines:
             self.hits.append(l.split())
+
+    def gvalue(self,data):
+        try:
+            c=data[0]
+        except:
+            print 'something wrong',data,type(data)
+        return int(data[0])
 
     def transTotalRank(self):
         '产生totalranks'
@@ -53,6 +61,7 @@ class initRankTotal:
         f.close()
         for l in lines:
             self.tranks.append(l.split())
+        SortFind.__init__(self,self.tranks)
 
     def show(self):
         for i in self.tranks:
@@ -82,7 +91,7 @@ class initRankTotal:
         return int(sco[int(score)])
 
 if __name__=='__main__':
-    trank=initRankTotal('../../store/sorteddochits','../../store/tranks')
+    trank=InitRankTotal('../../store/sorteddochits','../../store/tranks')
     trank.transTotalRank()
     trank.save()
 

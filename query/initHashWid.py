@@ -66,9 +66,9 @@ class InitHashWid(SortFind):
 
 if __name__=='__main__':
     hit=InitHashWid('../../store/sortedwidhits','../../store/hithash')
-    #hit.transHashWid()
-    #hit.save()
-    hit.initHashWid()
+    hit.transHashWid()
+    hit.save()
+    #hit.initHashWid()
     #hit.show()
     print hit.find([34,0])
 
