@@ -11,6 +11,8 @@ from indexer import sorter
 #为了便于测试和性能的保证
 #将文件每100个保存到一个文件中 分开储存
 #需要 在docID排序的基础上 再根据wordID进行排序
+#在docID排序时，并不需要重新进行排序（只要保证docID已经排序便可)
+#排序顺序必须为： docID > wordID
 
 class Indexer:
     '索引器'
@@ -31,13 +33,18 @@ class Indexer:
         '方法运行'
         findWI=self.findWordId
         li=os.listdir(self.docph)   #取得分词xml地址
-        for doc in li:
+        length=len(li)
+        for doc in range(length):
             print doc
             #对每个文件进行处理
             #print self.docph+doc
-            f=open(self.docph+'/'+doc)
-            c=f.read()
-            f.close()
+            try:
+                f=open(self.docph+'/'+str(doc))
+                c=f.read()
+                f.close()
+            except:
+                print 'no file',doc
+                continue
             tags=c.split('@chunwei@')
             #print 'the tags is'
             #print tags
@@ -50,16 +57,19 @@ class Indexer:
                     if wid: #保证只有词库中的词才能够被收录
                         self.hitlist.append([wid,doc,scoid,abspos+pos])
 
+    def sortDoc(self):
+        '对hit 根据docID进行排序'
+        print 'sortDoc'
+        #sort=sorter.hitDocSort(self.hitlist)
+        #sort.run()
+
     def sortWid(self):
         '对hit 根据wordID进行排序'
+        print 'wortWid'
         sort=sorter.hitWidSort(self.hitlist) #初始化
         sort.run()
         print 'succeed sorted wid'
 
-    def sortDoc(self):
-        '对hit 根据docID进行排序'
-        sort=sorter.hitDocSort(self.hitlist)
-        sort.run()
 
     def __saveCHits(self):
         self.savehits(self.topath)
@@ -82,10 +92,14 @@ class Indexer:
 if __name__=='__main__':
     index=Indexer('../store/wordsplit','../store/wordbar','../store/hits')
     index.run()
-    #根据wordID进行排序
-    index.sortWid()
-    index.savehits('../store/sortedwidhits')
+
     #根据docID进行排序
     index.sortDoc()
     index.savehits('../store/sorteddochits')
+
+    #根据wordID进行排序
+    '''
+    index.sortWid()
+    index.savehits('../store/sortedwidhits')
+    '''
     #index.savehits()

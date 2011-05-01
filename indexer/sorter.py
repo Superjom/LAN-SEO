@@ -17,7 +17,10 @@ class sorter:
     def quicksort(self,p,q):
         a=self.dali
         st=[]
+        index=1
         while True:
+            print 'runing',index
+            index+=1
             while p<q:
                 j=self.partition(a,p,q)
                 if (j-p)<(q-j):
@@ -66,7 +69,7 @@ class hitDocSort(sorter):
         sorter.__init__(self,datalist)
 
     def gvalue(self,data):
-        return data[1]
+        return int(data[1])
 
 if __name__=='__main__':
     dali=[ [12,2] , [34,2] , [0,45] , [1,32] ]

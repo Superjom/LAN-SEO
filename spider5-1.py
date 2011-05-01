@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-#from sgmllib import SGMLParser  
 import threading  
 import time  
 import urllib2  
@@ -219,8 +218,6 @@ class reptile(threading.Thread):
                 break
                 return True
                 
-
-
 
     def trans_d(self,tem_url,rawurls):
         '将收获的url转化为 相对于局部主地址的绝对地址 并将其加入到inqueue中'
