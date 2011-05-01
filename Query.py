@@ -4,6 +4,8 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 from ICTCLAS50.Ictclas import Ictclas
+from indexer.wordbar import Wordbar as wordbar
+from query.initHashWid import InitHashWid
 
 class Hitlist(list):
     '查询中产生的查询结果列表'
@@ -18,9 +20,9 @@ class Hitlist(list):
     def find(self,hit):
         #传入标准hit  [wordID,docID,rank,pos]
         #返回记录格式 [docID,rank]
-        docID=hit[1]
-        score=self.score(hit) #此次记录得分
-
+        docID=int(hit[1])
+        score=int(self.score(hit)) #此次记录得分
+        #print 'pre score',type(score)
         l=len(self)
         first=0
         end=l-1
@@ -30,6 +32,7 @@ class Hitlist(list):
             return False
         while first<end:
             mid=(first+end)/2
+            
             if docID>self[mid][0]:
                 first=mid+1
             elif docID<self[mid][0]:
@@ -47,7 +50,7 @@ class Hitlist(list):
                 self[end][1]+=score
                 return True
         elif first>end:
-            self.insert(first,docID)
+            self.insert(first,[docID,score])
             return False
         else:
             self[mid][1]+=score
@@ -56,16 +59,16 @@ class Hitlist(list):
     def score(self,hit):
         '计算加分'
         sco={
-            0:10,   #title
-            1:3,    #b
-            2:5,    #h1
-            3:4,    #h2
-            4:3,    #h3
-            5:1,    #a
-            6:1     #content
+            0:50,   #title
+            1:30,    #b
+            2:50,    #h1
+            3:40,    #h2
+            4:30,    #h3
+            5:3,    #a
+            6:3     #content
         }
         score=hit[2]
-        return sco[int(score)]
+        return int(sco[int(score)])
 
 
 
@@ -74,39 +77,72 @@ class Query:
     def __init__(self,wbph,hitph):
         'init'
         self.ict=Ictclas('ICTCLAS50/') 
+        self.hitph=hitph
+        self.hitdoclist=Hitlist() #得分统计列表
+        self.wordbar=wordbar('../store/wordbar') #词库 以便得到wordID
+        #hithash相关
+        self.hithasher=InitHashWid('../store/sortedwidhits','../store/hithash')
+        self.hithasher.initHashWid()#初始化hithash
+        self.hits=[]
+        self.inithits()#初始化hits
+        self.hithash=self.hithasher.hithash
+        self.length=len(self.hits) #hits长度
+        print 'length of hits is',self.length
 
-    def initHashHit(self,hitph):
-        #初始化hits列表
-        f=open(hitph)
+    def inithits(self):
+        f=open(self.hitph)
         lines=f.readlines()
         f.close()
-        self.hits=[]
         for l in lines:
             self.hits.append(l.split())
-        #开始进行索引化
-        #hits 根据每个 wordID进行索引
-        length=len(self.hits)
-        hashashed='-1'
-        last=self.hits[0][0]#初始化 第一个wordID
-        for i,hit in enumerate(self.hits):
-            if hashashed==hit[0]:
+
+    def query(self,strr):
+        '单个查询'
+        words=self.wordsplit(strr) #分词后的查询结果
+        print '分词结果为',words
+        for word in words.split():
+            #对每个word进行处理
+            print '--start to query word--',word
+            wordid=self.wordbar.find(word) #需要查询的wordID
+            print '查得的wordID为',wordid
+            if wordid:
+                hithashpos=self.hithasher.find([wordid,0]) #hithasher返回的为目标数据在hithash中的位置
+                if hithashpos:
+                    starthitpos=int(self.hithash[hithashpos][1])
+                    print '查得的hitpos为',starthitpos
+                    #得到wordID在hits表中的片段地址 starthitpos  endhitpos
+                    print '开始地址',starthitpos
+                    if starthitpos+1<self.length:
+                        endhitpos=int(self.hithash[hithashpos+1][1])-1
+                    else:
+                        endhitpos=starthitpos
+                else:
+                    continue
+            else:
                 continue
-            print 'wordID ...',hit[0]
-            last=int(hit[0]) #下面开始进行遍历
-            
-
+            #开始扫描片段 进行加分计算
+            index=starthitpos
+            print '结束地址',endhitpos
+            while index<=endhitpos:
+                #开始加分处理
+                #print self.hits[index][0]
+                self.hitdoclist.find(self.hits[index])
+                index+=1
+        for i in self.hitdoclist:
+            print i
         
-
-
-
-    
     def wordsplit(self,sentence):
         '将查询语句分词'
         return self.ict.split(sentence)
 
 if __name__=='__main__':
-    query=Query('hello','ere')
-    print query.wordsplit('你好中国')
+    query=Query('hello','../store/sortedwidhits')
+    '''word=raw_input('query>>')
+    while word != 'q':
+        query.query(word)'''
+    query.query('理学院')
+    #query.query('hello')
+    
 
         
         
