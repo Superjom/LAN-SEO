@@ -24,6 +24,7 @@ class Indexer:
         self.hitlist=[]     
         self.each=100       #每一百个储存到一个文件中
         self.num=0          #直接处理的文件数目
+        self.htmlph='../store/html' #解决bug 
         #权值 根据 id 从0开始排起  最终通过pagerank进行处理
 
         #开始初始化 词库
@@ -32,7 +33,8 @@ class Indexer:
     def run(self):
         '方法运行'
         findWI=self.findWordId
-        li=os.listdir(self.docph)   #取得分词xml地址
+        li=os.listdir(self.htmlph)   #取得分词xml地址
+        #!!!!!!!!!!!!!!此处原先有bug  wordsplit中的文件比html少很多  为了保持完备性，应该以html中文件数目为原型进行遍历
         length=len(li)
         for doc in range(length):
             print doc
@@ -98,6 +100,6 @@ if __name__=='__main__':
     index.savehits('../store/sorteddochits')
 
     #根据wordID进行排序
-    index.sortWid()
-    index.savehits('../store/sortedwidhits')
+    '''index.sortWid()
+    index.savehits('../store/sortedwidhits')'''
     #index.savehits()

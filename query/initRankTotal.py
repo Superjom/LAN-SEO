@@ -79,12 +79,12 @@ class InitRankTotal(SortFind):
     def score(self,hit):
         '返回相应标签得分'
         sco={
-            0:50,   #title
+            0:60,   #title
             1:30,    #b
             2:50,    #h1
             3:40,    #h2
             4:30,    #h3
-            5:3,    #a
+            5:0,    #a
             6:3     #content
         }
         score=hit[2]

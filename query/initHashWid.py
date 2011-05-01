@@ -70,5 +70,5 @@ if __name__=='__main__':
     hit.save()
     #hit.initHashWid()
     #hit.show()
-    print hit.find([34,0])
+    #print hit.find([34,0])
 

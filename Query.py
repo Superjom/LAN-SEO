@@ -9,8 +9,12 @@ from query.initHashWid import InitHashWid
 from query.initRankTotal import InitRankTotal
 #浮点数计算
 from decimal import *
+from query.sorter import sorter
 
 class Hitlist(list):
+    def __init__(self):
+        self.firvote=10 #首次命中加分的比率
+
     '查询中产生的查询结果列表'
     #计算每个docID的得分情况
     #初始的得分规则：
@@ -20,18 +24,23 @@ class Hitlist(list):
     #   查询docID是否已经存在 如果不存在 则插入记录（排序）
     #   在查询过程中 将得分情况加入
 
+    #   为了充分保证关键字的全面性 对于每个关键子的第一一次hit
+    #   进行双倍的加分
+#   #   为此 将会在doclist中加入 一个标志符号
+
     def find(self,hit):
         #传入标准hit  [wordID,docID,rank,pos]
         #返回记录格式 [docID,rank]
+        #对于首次命中将会添加slef.firvote的倍率
+        #为此添加了一个标志位
         docID=int(hit[1])
         score=int(self.score(hit)) #此次记录得分
-        #print 'pre score',type(score)
         l=len(self)
         first=0
         end=l-1
         mid=0
         if l==0:
-            self.insert(0,[docID,score] )
+            self.insert(0,[docID,self.firvote*score,1] )
             return False
         while first<end:
             mid=(first+end)/2
@@ -44,34 +53,46 @@ class Hitlist(list):
                 break
         if first==end:
             if self[first][0]>docID:
-                self.insert(first,[docID,score])
+                self.insert(first,[docID,self.firvote*score,1])
                 return False
             elif self[first][0]<docID:
-                self.insert(first+1,[docID,score])
+                self.insert(first+1,[docID,self.firvote*score,1])
                 return False
             else:
-                self[end][1]+=score
+                if self[end][2]==0:
+                    self[end][1]+=self.firvote*score
+                else:
+                    self[end][1]+=score
                 return True
         elif first>end:
-            self.insert(first,[docID,score])
+            self.insert(first,[docID,self.firvote*score,1])
             return False
         else:
-            self[mid][1]+=score
+            if self[mid][2]==0:
+                self[mid][1]+=self.firvote*score
+            else:
+                self[mid][1]+=score
             return True
     
     def score(self,hit):
         '计算加分'
         sco={
-            0:50,   #title
+            0:60,   #title
             1:30,    #b
             2:50,    #h1
             3:40,    #h2
             4:30,    #h3
-            5:3,    #a
+            5:0,    #a
             6:3     #content
         }
         score=hit[2]
         return int(sco[int(score)])
+    
+    def initStatus(self):
+        '对其中每个doc的记录回原'
+        for i,vote in enumerate(self):
+            self[i][2]=0 #0代表初始值   1代表已经进行首次加分
+
 
 
 
@@ -95,6 +116,8 @@ class Query:
         self.hithash=self.hithasher.hithash
         self.length=len(self.hits) #hits长度
         print 'length of hits is',self.length
+        #排序
+        self.sorter=sorter()
 
     def inithits(self):
         f=open(self.hitph)
@@ -116,9 +139,9 @@ class Query:
                 hithashpos=self.hithasher.find([wordid,0]) #hithasher返回的为目标数据在hithash中的位置
                 if hithashpos:
                     starthitpos=int(self.hithash[hithashpos][1])
-                    print '查得的hitpos为',starthitpos
+                    #print '查得的hitpos为',starthitpos
                     #得到wordID在hits表中的片段地址 starthitpos  endhitpos
-                    print '开始地址',starthitpos
+                    #print '开始地址',starthitpos
                     if starthitpos+1<self.length:
                         endhitpos=int(self.hithash[hithashpos+1][1])-1
                     else:
@@ -129,12 +152,14 @@ class Query:
                 continue
             #开始扫描片段 进行加分计算
             index=starthitpos
-            print '结束地址',endhitpos
+            #print '结束地址',endhitpos
             while index<=endhitpos:
                 #开始加分处理
-                #print self.hits[index][0]
                 self.hitdoclist.find(self.hits[index])
                 index+=1
+        #对结尾进行还原
+        print '对结尾进行还原'
+        self.hitdoclist.initStatus()
 
         print 'the former doclist---------------------------'
         for i in self.hitdoclist:
@@ -148,12 +173,16 @@ class Query:
             docid=score[0]
             rankpos=self.ranktotal.find([docid,0])#返回记录的位置
             ranktotal=self.ranktotal.tranks[rankpos][1]
-            print 'rank',score[1],type(score[1])
-            print 'the total rank',int(ranktotal)
+            print score[0],'rank',score[1],int(ranktotal)
             self.hitdoclist[i][1]=float(Decimal(score[1])/Decimal(int(ranktotal)))
+
         print 'start to print the hitdoclist'
         for i in self.hitdoclist:
             print i
+        self.sorter.run(self.hitdoclist)
+        print 'the result'
+        self.sorter.showlist()
+
 
         
     def wordsplit(self,sentence):
@@ -167,7 +196,6 @@ if __name__=='__main__':
         query.query(word)'''
     query.query('开放的中国农业大学欢迎您')
 
-    #query.query('hello')
     
 
         
