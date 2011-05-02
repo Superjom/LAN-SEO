@@ -7,6 +7,7 @@ from SortFind import SortFind
 
 class InitRankTotal(SortFind):
     '计算每个doc中标签得分总和 以便计算相对rank'
+    #!!!!采用了新的排序算法 将 tranks的结构扩展为 [titlesum,bsum,h1sum,h2sum,h3sum,asum,contentsum]
     def __init__(self,dochitph,tRankph):
         self.tRankph=tRankph #将要保存或初始化的rankTotal列表文件
         self.hits=[]
@@ -41,12 +42,14 @@ class InitRankTotal(SortFind):
             j=startpos
             startdot=self.hits[startpos][1] #新记录片段的开始点
             score=self.score(self.hits[j])
-            self.tranks.append([startdot,score]) #加入docID记录
+            self.tranks.append([startdot,0,0,0,0,0,0,0,0]) #加入docID记录
+            #对值进行修改
+            self.tranks[-1][ int(self.hits[j][2])+2 ]=score
 
             while j<length and self.hits[j][1]==startdot:
                 #开始处理
                 score=self.score(self.hits[j])
-                self.tranks[index][1]+=score #计算score总和 修改docID记录
+                self.tranks[index][int( self.hits[j][2] )+2]+=score #计算score总和 修改docID记录
                 #索引值开始变化
                 j+=1
                 lastwidth+=1
@@ -72,7 +75,7 @@ class InitRankTotal(SortFind):
         f=open(self.tRankph,'w')
         strr=''
         for tscore in self.tranks:
-            strr+=str(tscore[0])+' '+str(tscore[1])+'\n'
+            strr+=str(tscore[0])+' '+str(tscore[1])+str(tscore[2])+' '+str(tscore[3])+' '+str(tscore[4])+' '+str(tscore[5])+' '+str(tscore[6]) +' '+str(tscore[7])+' '+str(tscore[8])+'\n'
         f.write(strr)
         f.close()
 
