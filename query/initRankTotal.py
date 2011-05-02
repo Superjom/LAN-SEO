@@ -42,14 +42,14 @@ class InitRankTotal(SortFind):
             j=startpos
             startdot=self.hits[startpos][1] #新记录片段的开始点
             score=self.score(self.hits[j])
-            self.tranks.append([startdot,0,0,0,0,0,0,0,0]) #加入docID记录
+            self.tranks.append([startdot,0,0,0,0,0,0,0]) #加入docID记录
             #对值进行修改
-            self.tranks[-1][ int(self.hits[j][2])+2 ]=score
+            self.tranks[-1][ int(self.hits[j][2])+1 ]=score
 
             while j<length and self.hits[j][1]==startdot:
                 #开始处理
                 score=self.score(self.hits[j])
-                self.tranks[index][int( self.hits[j][2] )+2]+=score #计算score总和 修改docID记录
+                self.tranks[index][int( self.hits[j][2] )+1]+=score #计算score总和 修改docID记录
                 #索引值开始变化
                 j+=1
                 lastwidth+=1
@@ -63,7 +63,11 @@ class InitRankTotal(SortFind):
         lines=f.readlines()
         f.close()
         for l in lines:
-            self.tranks.append(l.split())
+            t=l.split()
+            for i,d in enumerate(t):
+                t[i]=int(d)
+            self.tranks.append(t)
+        print 'init SortFind'
         SortFind.__init__(self,self.tranks)
 
     def show(self):
@@ -75,7 +79,7 @@ class InitRankTotal(SortFind):
         f=open(self.tRankph,'w')
         strr=''
         for tscore in self.tranks:
-            strr+=str(tscore[0])+' '+str(tscore[1])+str(tscore[2])+' '+str(tscore[3])+' '+str(tscore[4])+' '+str(tscore[5])+' '+str(tscore[6]) +' '+str(tscore[7])+' '+str(tscore[8])+'\n'
+            strr+=str(tscore[0])+' '+str(tscore[1])+' '+str(tscore[2])+' '+str(tscore[3])+' '+str(tscore[4])+' '+str(tscore[5])+' '+str(tscore[6]) +' '+str(tscore[7])+'\n'
         f.write(strr)
         f.close()
 

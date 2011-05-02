@@ -8,7 +8,7 @@ class sorter:
     def __init__(self):
         self.dali=[]
     def gvalue(self,data):
-        return data[1]
+        return data[-1]
 
     def run(self,datalist):
         self.dali=datalist

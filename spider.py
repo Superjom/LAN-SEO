@@ -229,6 +229,7 @@ class reptile(threading.Thread):
         while True:
             if len(rawurls)>0:
                 item=rawurls.pop()
+                urlte=item
             else:
                 break
             if (item == None)or(len(item)<3):   
@@ -264,6 +265,12 @@ class reptile(threading.Thread):
                 #item=urltest.absDirUrl(item) #绝对地址再次进行处理
                 if self.list.find(item) == False:   
                     self.inqueue.put(item) 
+            #记录链接情况
+            self.Flcok.acquire()  
+            confile = open('../store/urltest.txt', 'a')  
+            confile.write( tem_url+' '+urlte+ ' ' + item+ '\n')  
+            confile.close()  
+            self.Flcok.release()  
          
 
     def __backFind(self,home,s):

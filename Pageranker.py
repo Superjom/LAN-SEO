@@ -10,7 +10,14 @@ sys.setdefaultencoding('utf-8')
 class Pageranker:
     'pagerank计算'
     #需要生成特定的表
-    def __init__(self,votetoph,votefrph):
+    def __init__(self,sortedurlph,votetoph,votefrph):
+        #得到ruanks的长度
+        f=open(sortedurlph)
+        lines=f.readlines()
+        f.close()
+        self.ranklength=len(lines)
+        print 'get ranklength',self.ranklength
+
         #初始化votelist列表
         f=open(votetoph)
         c=f.readlines()
@@ -32,7 +39,7 @@ class Pageranker:
         self.ranks1=[]
         initrank=float(1)/len(self.voteTo)
         #初始设为1/s
-        for i in range(len(self.voteTo)):
+        for i in range(self.ranklength):
             self.ranks.append(initrank)
             self.ranks1.append(initrank) #rank1为rank副本
         #初始化每个voter的outN
@@ -42,6 +49,7 @@ class Pageranker:
         '计算pagerank主程序 循环一定次数'
         index=0
         while index<num:
+            print 'the',index,'run'
             self.percal()
             index+=1
 
@@ -89,7 +97,7 @@ class Pageranker:
             #如果已经处理过 跳过
             if hasvoted==vote[0]:
                 continue
-            print 'vote ...',vote[0]
+            #print 'vote ...',vote[0]
             last=int(vote[0]) #from 记录本次投票方 防止重复
             outlinknum=1
             j=i+1
@@ -106,33 +114,18 @@ class Pageranker:
 
     def save(self,ph):
         print 'start to save'
+        print 'get length',len(self.ranks)
         strr=''
+
         for rank in self.ranks:
-            strr+=str(rank)+' '
+            strr+=str(rank)+'\n'
+
         f=open(ph,'w')
         f.write(strr)
         f.close()
 
 if __name__=='__main__':
-    ranker=Pageranker('../store/votetolist','../store/voteflist')
-    ranker.run(2)
+    ranker=Pageranker('../store/sortedurls.txt','../store/votetolist','../store/voteflist')
+    ranker.run(58)
     ranker.save('../store/pageranker')
-
-
-
-                
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
